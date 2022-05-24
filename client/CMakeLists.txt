@@ -9,7 +9,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
-add_executable(robots-client main.cpp)
+add_executable(robots-client client.cpp
+        debug_functions.cpp debug_functions.hpp
+
+        communication/client_message.cpp communication/client_message.hpp
+
+        serializers/std_types_serializers.cpp serializers/std_types_serializers.hpp
+
+        management/client_options.cpp management/client_options.hpp
+
+        types.hpp)
 
 TARGET_INCLUDE_DIRECTORIES(robots-client PRIVATE ${Boost_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(robots-client LINK_PUBLIC ${Boost_LIBRARIES})
