@@ -16,9 +16,7 @@ ByteList ClientMessage::serialize() {
     return result;
 }
 
-ClientMessageJoin::ClientMessageJoin(const ByteList &message) {
-    client_message_type = ClientMessageType::Join;
-}
+ClientMessageJoin::ClientMessageJoin(const ByteList &message) : ClientMessage(ClientMessageType::PlaceBomb) {}
 
 ByteList ClientMessageJoin::serialize() {
     ByteList result;
@@ -33,9 +31,7 @@ ByteList ClientMessageJoin::serialize() {
     return result;
 }
 
-ClientMessageMove::ClientMessageMove(const ByteList &message) {
-    client_message_type = ClientMessageType::Move;
-}
+ClientMessageMove::ClientMessageMove(const ByteList &message) : ClientMessage(ClientMessageType::PlaceBomb) {}
 
 ByteList ClientMessageMove::serialize() {
     ByteList result;

@@ -10,7 +10,7 @@
 
 class ClientMessage {
 public:
-    ClientMessage() = default;
+    virtual ~ClientMessage() = default;
     explicit ClientMessage(ClientMessageType client_message_type) : client_message_type(client_message_type) {}
     explicit ClientMessage(const ByteList& message);
 

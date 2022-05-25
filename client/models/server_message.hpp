@@ -3,14 +3,30 @@
 
 #include <string>
 #include <cstdint>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "misc.hpp"
 #include "event.hpp"
 #include "../types.hpp"
 
-struct HelloMsg {
+class ServerMessage {
+public:
+    virtual ~ServerMessage() = default;
+    explicit ServerMessage(ServerMessageType server_message_type) : server_message_type(server_message_type) {}
+
+    ServerMessageType server_message_type;
+
+    virtual ByteList serialize() = 0;
+    virtual std::string to_string() = 0;
+};
+
+class ServerMessageHello : public ServerMessage {
+public:
+    ServerMessageHello(std::string server_name, std::uint8_t players_count,
+                       std::uint16_t size_x, std::uint16_t size_y, std::uint16_t game_length,
+                       std::uint16_t explosion_radius, std::uint16_t bomb_tier);
+
     std::string server_name;
     std::uint8_t players_count;
     std::uint16_t size_x;
@@ -18,41 +34,51 @@ struct HelloMsg {
     std::uint16_t game_length;
     std::uint16_t explosion_radius;
     std::uint16_t bomb_tier;
+
+    ByteList serialize() override;
+    std::string to_string() override;
 };
 
-struct AcceptedPlayerMsg {
+class ServerMessageAcceptedPlayer : public ServerMessage {
+public:
+    ServerMessageAcceptedPlayer(PlayerId id, Player player);
+
     PlayerId id;
     Player player;
+
+    ByteList serialize() override;
+    std::string to_string() override;
 };
 
-struct GameStartedMsg {
-    std::unordered_map<PlayerId, Player> players;
+class ServerMessageGameStarted : public ServerMessage {
+public:
+    explicit ServerMessageGameStarted(std::map<PlayerId, Player> players);
+
+    std::map<PlayerId, Player> players;
+
+    ByteList serialize() override;
+    std::string to_string() override;
 };
 
-struct TurnMsg {
+class ServerMessageTurn : public ServerMessage {
+public:
+    ServerMessageTurn(std::uint16_t turn, std::vector<std::shared_ptr<Event>> events);
+
     std::uint16_t turn;
-    std::vector<Event> events;
+    std::vector<std::shared_ptr<Event>> events;
+
+    ByteList serialize() override;
+    std::string to_string() override;
 };
 
-struct GameEndedMsg {
-    std::unordered_map<PlayerId, Score> scores;
-};
+class ServerMessageGameEnded : public ServerMessage {
+public:
+    explicit ServerMessageGameEnded(std::map<PlayerId, Score> scores);
 
-struct ServerMessage {
-    ServerMessageType server_message_type;
-    union server_message_args {
-        explicit server_message_args(HelloMsg msg) : hello(std::move(msg)) {}
-        explicit server_message_args(AcceptedPlayerMsg msg) : accepted_player(std::move(msg)) {}
-        explicit server_message_args(GameStartedMsg msg) : game_started(std::move(msg)) {}
-        explicit server_message_args(TurnMsg msg) : turn(std::move(msg)) {}
-        explicit server_message_args(GameEndedMsg msg) : game_ended(std::move(msg)) {}
+    std::map<PlayerId, Score> scores;
 
-        HelloMsg hello;
-        AcceptedPlayerMsg accepted_player;
-        GameStartedMsg game_started;
-        TurnMsg turn;
-        GameEndedMsg game_ended;
-    };
+    ByteList serialize() override;
+    std::string to_string() override;
 };
 
 #endif //ROBOTS_CLIENT_SERVER_MESSAGE_HPP

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstdint>
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include <memory>
 
@@ -10,6 +9,7 @@
 
 #include "debug_functions.hpp"
 #include "models/client_message.hpp"
+#include "models/server_message.hpp"
 #include "models/event.hpp"
 #include "serializers/std_types_serializers.hpp"
 #include "management/client_options.hpp"
@@ -81,6 +81,34 @@ int main(int argc, char** argv) {
         std::cout << event->to_string();
         print_serialized(event->serialize());
     }
+
+    ServerMessageHello serverMessageHello(client_options.get_server_address(), 10, 4, 2, 69, 2137, 8);
+    std::cout << serverMessageHello.to_string();
+    print_serialized(serverMessageHello.serialize());
+
+    ServerMessageAcceptedPlayer serverMessageAcceptedPlayer(3, {client_options.get_player_name(), client_options.get_gui_address()});
+    std::cout << serverMessageAcceptedPlayer.to_string();
+    print_serialized(serverMessageAcceptedPlayer.serialize());
+
+    std::map<PlayerId, Player> players;
+    players.insert({5, {"adam", "xd"}});
+    players.insert({2, {"dawid", "lol"}});
+
+    ServerMessageGameStarted serverMessageGameStarted(players);
+    std::cout << serverMessageGameStarted.to_string();
+    print_serialized(serverMessageGameStarted.serialize());
+
+    ServerMessageTurn serverMessageTurn(123, events);
+    std::cout << serverMessageTurn.to_string();
+    print_serialized(serverMessageTurn.serialize());
+
+    std::map<PlayerId, Score> scores;
+    scores.insert({6, 40000000});
+    scores.insert({2, 0});
+
+    ServerMessageGameEnded serverMessageGameEnded(scores);
+    std::cout << serverMessageGameEnded.to_string();
+    print_serialized(serverMessageGameEnded.serialize());
 
     return 0;
 }
