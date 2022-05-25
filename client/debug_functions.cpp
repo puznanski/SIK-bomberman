@@ -34,3 +34,9 @@ void print_client_params(const ClientOptions& options) {
     std::cout << "Server address: " << options.get_server_address() << "\n";
     print_debug_msg_end();
 }
+
+void print_deserialized(const std::string& deserialized) {
+    print_debug_msg_beg("deserialization");
+    std::cout << deserialized;
+    print_debug_msg_end();
+}

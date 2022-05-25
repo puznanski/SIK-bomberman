@@ -13,5 +13,6 @@ void print_debug_msg_beg(std::string name);
 void print_debug_msg_end();
 void print_serialized(const ByteList& x);
 void print_client_params(const ClientOptions& options);
+void print_deserialized(const std::string& deserialized);
 
 #endif //ROBOTS_CLIENT_DEBUG_FUNCTIONS_HPP

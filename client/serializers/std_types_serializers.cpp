@@ -2,6 +2,7 @@
 
 #include <arpa/inet.h>
 #include <iostream>
+#include <sstream>
 
 ByteList serialize_string(const std::string& str) {
     ByteList result;
@@ -40,4 +41,36 @@ ByteList serialize_uint32(std::uint32_t val) {
     }
 
     return result;
+}
+
+std::string deserialize_string(const ByteList& bytes, size_t beg, size_t len) {
+    std::stringstream ss;
+
+    for (size_t i = 0; i < len; i++) {
+        ss << bytes[i + beg];
+    }
+
+    return ss.str();
+}
+
+std::uint16_t deserialize_uint16(const ByteList& bytes, size_t beg) {
+    std::uint8_t temp[UINT16_SIZE];
+
+    for (size_t i = 0; i < UINT16_SIZE; i++) {
+        temp[i] = bytes[i + beg];
+    }
+
+    auto net_val = reinterpret_cast<std::uint16_t*>(&temp);
+    return htons(*net_val);
+}
+
+std::uint32_t deserialize_uint32(const ByteList& bytes, size_t beg) {
+    std::uint8_t temp[UINT32_SIZE];
+
+    for (size_t i = 0; i < UINT32_SIZE; i++) {
+        temp[i] = bytes[i + beg];
+    }
+
+    auto net_val = reinterpret_cast<std::uint32_t*>(&temp);
+    return htonl(*net_val);
 }

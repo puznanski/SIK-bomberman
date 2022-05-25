@@ -6,7 +6,7 @@
 #include "../serializers/std_types_serializers.hpp"
 
 ClientMessage::ClientMessage(const ByteList& message) {
-    client_message_type = ClientMessageType::PlaceBlock;
+    client_message_type = static_cast<ClientMessageType>(message[0]);
 }
 
 ByteList ClientMessage::serialize() {
@@ -16,7 +16,9 @@ ByteList ClientMessage::serialize() {
     return result;
 }
 
-ClientMessageJoin::ClientMessageJoin(const ByteList &message) : ClientMessage(ClientMessageType::PlaceBomb) {}
+ClientMessageJoin::ClientMessageJoin(const ByteList &message) : ClientMessage(ClientMessageType::Join) {
+    name = deserialize_string(message, 2, message[1]);
+}
 
 ByteList ClientMessageJoin::serialize() {
     ByteList result;
@@ -31,7 +33,9 @@ ByteList ClientMessageJoin::serialize() {
     return result;
 }
 
-ClientMessageMove::ClientMessageMove(const ByteList &message) : ClientMessage(ClientMessageType::PlaceBomb) {}
+ClientMessageMove::ClientMessageMove(const ByteList &message) : ClientMessage(ClientMessageType::Move) {
+    direction = static_cast<Direction>(message[1]);
+}
 
 ByteList ClientMessageMove::serialize() {
     ByteList result;

@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     auto test = serialize_string(str);
     print_serialized(test);
 
-    ClientMessageJoin test2("😍💕");
+    ClientMessageJoin test2("Ąćźśż");
     std::cout << test2.to_string();
     print_serialized(test2.serialize());
 
@@ -109,6 +109,18 @@ int main(int argc, char** argv) {
     ServerMessageGameEnded serverMessageGameEnded(scores);
     std::cout << serverMessageGameEnded.to_string();
     print_serialized(serverMessageGameEnded.serialize());
+
+    auto test5 = serverMessageGameEnded.serialize();
+    std::cout << deserialize_uint32(test5, 11) << "\n";
+    std::cout << deserialize_string(test, 1, test[0]) << "\n";
+    print_debug_msg_end();
+
+    auto test2_des = ClientMessageJoin(test2);
+    auto test3_des = ClientMessageMove(test3);
+    auto test4_des = ClientMessage(test4);
+    print_deserialized(test2_des.to_string());
+    print_deserialized(test3_des.to_string());
+    print_deserialized(test4_des.to_string());
 
     return 0;
 }
