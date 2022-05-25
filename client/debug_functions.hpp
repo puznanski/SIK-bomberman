@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "communication/client_message.hpp"
+#include "models/client_message.hpp"
 #include "management/client_options.hpp"
 #include "types.hpp"
 

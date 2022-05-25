@@ -12,7 +12,10 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 add_executable(robots-client client.cpp
         debug_functions.cpp debug_functions.hpp
 
-        communication/client_message.cpp communication/client_message.hpp
+        models/client_message.cpp models/client_message.hpp
+        models/server_message.cpp models/server_message.hpp
+        models/event.cpp models/event.hpp
+        models/misc.cpp models/misc.hpp
 
         serializers/std_types_serializers.cpp serializers/std_types_serializers.hpp
 
