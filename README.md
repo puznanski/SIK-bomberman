@@ -1,6 +1,8 @@
 # SIK-bomberman
 Second big assignment of the computer networks course. Academic year 2021/22. 
 
+Na students po skompilowaniu trzeba użyć komendy: `export LD_LIBRARY_PATH=/opt/gcc-11.2/lib64`
+
 Pytania proszę wysyłać na adres agluszak@mimuw.edu.pl.
 
 Historia zmian:
