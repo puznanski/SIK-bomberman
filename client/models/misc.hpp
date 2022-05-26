@@ -19,6 +19,7 @@ public:
     std::uint16_t y;
 
     ByteList serialize() const;
+    bool operator<(const Position &rhs) const;
 };
 
 class Bomb {
@@ -35,6 +36,7 @@ public:
 
 class Player {
 public:
+    Player();
     Player(std::string name, std::string address);
     explicit Player(TcpBytestream& bytestream);
     explicit Player(UdpBytestream& bytestream);

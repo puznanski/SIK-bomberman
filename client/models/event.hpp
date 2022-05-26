@@ -5,6 +5,7 @@
 
 #include "../types.hpp"
 #include "../networking/tcp_bytestream.hpp"
+#include "../management/client_game_state.hpp"
 #include "misc.hpp"
 
 class Event {
@@ -15,7 +16,7 @@ public:
     EventType event_type;
 
     virtual ByteList serialize() = 0;
-    virtual std::string to_string() = 0;
+    virtual void handle_event(ClientGameState& client_game_state) = 0;
 };
 
 class EventBombPlaced : public Event {
@@ -27,7 +28,7 @@ public:
     Position position{0, 0};
 
     ByteList serialize() override;
-    std::string to_string() override;
+    void handle_event(ClientGameState &client_game_state) override;
 };
 
 class EventBombExploded : public Event {
@@ -40,7 +41,7 @@ public:
     std::vector<Position> blocks_destroyed;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    void handle_event(ClientGameState &client_game_state) override;
 };
 
 class EventPlayerMoved : public Event {
@@ -52,7 +53,7 @@ public:
     Position position;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    void handle_event(ClientGameState &client_game_state) override;
 };
 
 class EventBlockPlaced : public Event {
@@ -63,7 +64,7 @@ public:
     Position position;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    void handle_event(ClientGameState &client_game_state) override;
 };
 
 #endif //ROBOTS_CLIENT_EVENT_HPP

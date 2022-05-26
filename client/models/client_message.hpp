@@ -17,9 +17,6 @@ public:
     ClientMessageType client_message_type{};
 
     virtual ByteList serialize();
-
-    /* DEBUG */
-    virtual std::string to_string();
 };
 
 class ClientMessageJoin : public ClientMessage {
@@ -30,9 +27,6 @@ public:
     std::string name;
 
     ByteList serialize() override;
-
-    /* DEBUG */
-    std::string to_string() override;
 };
 
 class ClientMessageMove : public ClientMessage {
@@ -43,9 +37,6 @@ public:
     Direction direction;
 
     ByteList serialize() override;
-
-    /* DEBUG */
-    std::string to_string() override;
 };
 
 #endif //ROBOTS_CLIENT_CLIENT_MESSAGE_HPP

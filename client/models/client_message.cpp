@@ -1,8 +1,5 @@
 #include "client_message.hpp"
 
-#include <iostream>
-#include <sstream>
-
 #include "../serializers/std_types_serializers.hpp"
 
 ByteList ClientMessage::serialize() {
@@ -39,23 +36,4 @@ ByteList ClientMessageMove::serialize() {
     result.emplace_back(client_message_type);
     result.emplace_back(direction);
     return result;
-}
-
-/* DEBUG */
-std::string ClientMessage::to_string() {
-    std::stringstream ss;
-    ss << "ClientMessage: " << client_message_type << "\n";
-    return ss.str();
-}
-
-std::string ClientMessageJoin::to_string() {
-    std::stringstream ss;
-    ss << "ClientMessage: " << client_message_type << " { name: " << name << " }\n";
-    return ss.str();
-}
-
-std::string ClientMessageMove::to_string() {
-    std::stringstream ss;
-    ss << "ClientMessage: " << client_message_type << " { direction: " << direction << " }\n";
-    return ss.str();
 }

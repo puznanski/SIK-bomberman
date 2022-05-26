@@ -25,6 +25,14 @@ ByteList Position::serialize() const {
     return result;
 }
 
+bool Position::operator<(const Position &rhs) const {
+    if (x < rhs.x)
+        return true;
+    if (rhs.x < x)
+        return false;
+    return y < rhs.y;
+}
+
 Bomb::Bomb(Position position, std::uint16_t timer) : position(position), timer(timer) {}
 
 Bomb::Bomb(TcpBytestream &bytestream) {
@@ -43,6 +51,8 @@ ByteList Bomb::serialize() const {
     result.insert(result.end(), serialized_timer.begin(), serialized_timer.end());
     return result;
 }
+
+Player::Player() : name(), address() {}
 
 Player::Player(std::string name, std::string address) : name(std::move(name)), address(std::move(address)) {}
 

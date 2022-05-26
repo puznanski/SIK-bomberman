@@ -39,7 +39,7 @@ void ClientOptions::parse_options(int argc, char** argv) {
         throw ClientOptionsException();
     }
 
-    port = vm["port"].as<std::int32_t>();
+    port = static_cast<uint16_t>(vm["port"].as<std::int32_t>());
     player_name = vm["player-name"].as<std::string>();
 
     auto gui_address = vm["gui-address"].as<std::string>();

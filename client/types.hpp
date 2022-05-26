@@ -41,9 +41,28 @@ enum ServerMessageType {
     GameEnded = 4
 };
 
-enum GuiMessageType {
+enum DrawMessageType {
     Lobby = 0,
     Game = 1
+};
+
+enum GuiMessageType {
+    PlaceBombGui = 0,
+    PlaceBlockGui = 1,
+    MoveGui = 2
+};
+
+enum GameState {
+    InLobby = 0,
+    InGame = 1
+};
+
+class UdpWrongMessageException : public std::exception {
+
+};
+
+class TcpWrongMessageException : public std::exception {
+
 };
 
 #endif //ROBOTS_CLIENT_TYPES_HPP

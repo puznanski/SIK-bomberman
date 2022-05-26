@@ -5,16 +5,17 @@ set(Boost_INCLUDE_DIR /usr/include/boost)
 set(Boost_LIBRARY_DIR /usr/lib/x86_64-linux-gnu)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+ADD_COMPILE_OPTIONS(-Wall -Wextra -Wconversion -Werror -O2 -std=gnu++20)
 
 FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 add_executable(robots-client client.cpp
-        debug_functions.cpp debug_functions.hpp
 
         models/client_message.cpp models/client_message.hpp
-        models/gui_message.cpp models/gui_message.hpp
         models/server_message.cpp models/server_message.hpp
+        models/draw_message.cpp models/draw_message.hpp
+        models/gui_message.cpp models/gui_message.hpp
         models/event.cpp models/event.hpp
         models/misc.cpp models/misc.hpp
 
@@ -23,6 +24,7 @@ add_executable(robots-client client.cpp
         management/client_options.cpp management/client_options.hpp
         management/client_manager.cpp management/client_manager.hpp
         management/client_game_state.cpp management/client_game_state.hpp
+        management/game_handlers.cpp management/game_handlers.hpp
 
         networking/tcp_bytestream.cpp networking/tcp_bytestream.hpp
         networking/udp_bytestream.cpp networking/udp_bytestream.hpp

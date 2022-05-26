@@ -1,20 +1,19 @@
 #include "server_message.hpp"
 
 #include <utility>
-#include <sstream>
 
 #include "../serializers/std_types_serializers.hpp"
 
 ServerMessageHello::ServerMessageHello(std::string server_name, std::uint8_t players_count,
                                        std::uint16_t size_x, std::uint16_t size_y,
                                        std::uint16_t game_length, std::uint16_t explosion_radius,
-                                       std::uint16_t bomb_tier) : ServerMessage(ServerMessageType::Hello),
+                                       std::uint16_t bomb_timer) : ServerMessage(ServerMessageType::Hello),
                                                                   server_name(std::move(server_name)),
                                                                   players_count(players_count),
                                                                   size_x(size_x), size_y(size_y),
                                                                   game_length(game_length),
                                                                   explosion_radius(explosion_radius),
-                                                                  bomb_tier(bomb_tier) {}
+                                                                  bomb_timer(bomb_timer) {}
 
 ServerMessageHello::ServerMessageHello(TcpBytestream &bytestream) : ServerMessage(ServerMessageType::Hello) {
     server_name = deserialize_string(bytestream.get_bytes(bytestream.get_byte()));
@@ -23,7 +22,7 @@ ServerMessageHello::ServerMessageHello(TcpBytestream &bytestream) : ServerMessag
     size_y = deserialize_uint16(bytestream.get_bytes(UINT16_SIZE));
     game_length = deserialize_uint16(bytestream.get_bytes(UINT16_SIZE));
     explosion_radius = deserialize_uint16(bytestream.get_bytes(UINT16_SIZE));
-    bomb_tier = deserialize_uint16(bytestream.get_bytes(UINT16_SIZE));
+    bomb_timer = deserialize_uint16(bytestream.get_bytes(UINT16_SIZE));
 }
 
 ByteList ServerMessageHello::serialize() {
@@ -46,23 +45,15 @@ ByteList ServerMessageHello::serialize() {
     ByteList serialized_explosion_radius = serialize_uint16(explosion_radius);
     append_to_vector(result, serialized_explosion_radius);
 
-    ByteList serialized_bomb_tier = serialize_uint16(bomb_tier);
-    append_to_vector(result, serialized_bomb_tier);
+    ByteList serialized_bomb_timer = serialize_uint16(bomb_timer);
+    append_to_vector(result, serialized_bomb_timer);
 
     return result;
 }
 
-std::string ServerMessageHello::to_string() {
-    std::stringstream ss;
-    ss << "ServerMessage (Hello): { server_name: " << server_name << ", " <<
-                                "players_count: " << players_count + 0 << ", " <<
-                                "size_x: " << size_x << ", " <<
-                                "size_y: " << size_y << ", " <<
-                                "game_length: " << game_length << ", " <<
-                                "explosion_radius: " << explosion_radius << ", " <<
-                                "bomb_tier: " << bomb_tier << " }\n";
-
-    return ss.str();
+std::shared_ptr<DrawMessage> ServerMessageHello::get_draw_message(ClientGameState &client_game_state) {
+    client_game_state.set_from_hello_message(*this);
+    return client_game_state.get_lobby_draw_message();
 }
 
 ServerMessageAcceptedPlayer::ServerMessageAcceptedPlayer(PlayerId id, Player player) : ServerMessage(ServerMessageType::AcceptedPlayer), id(id),
@@ -84,11 +75,9 @@ ByteList ServerMessageAcceptedPlayer::serialize() {
     return result;
 }
 
-std::string ServerMessageAcceptedPlayer::to_string() {
-    std::stringstream ss;
-    ss << "ServerMessage (AcceptedPlayer): { player_id: " << id + 0 << ", player: { name: " << player.name << ", address: " << player.address << " } }\n";
-
-    return ss.str();
+std::shared_ptr<DrawMessage> ServerMessageAcceptedPlayer::get_draw_message(ClientGameState &client_game_state) {
+    client_game_state.add_player(id, player);
+    return client_game_state.get_lobby_draw_message();
 }
 
 ServerMessageGameStarted::ServerMessageGameStarted(std::map<PlayerId, Player> players) :
@@ -106,7 +95,7 @@ ByteList ServerMessageGameStarted::serialize() {
     ByteList result;
     result.push_back(server_message_type);
 
-    ByteList serialized_map_length = serialize_uint32(players.size());
+    ByteList serialized_map_length = serialize_uint32(static_cast<std::uint32_t>(players.size()));
     append_to_vector(result, serialized_map_length);
 
     for (const auto &player : players) {
@@ -117,17 +106,10 @@ ByteList ServerMessageGameStarted::serialize() {
     return result;
 }
 
-std::string ServerMessageGameStarted::to_string() {
-    std::stringstream ss;
-    ss << "ServerMessage (GameStarted): { players_map: [";
-
-    for (const auto &player : players) {
-        ss << " {" << player.first + 0 << " : {" << player.second.name << ", " << player.second.address << "}} ";
-    }
-
-    ss << "] }\n";
-
-    return ss.str();
+std::shared_ptr<DrawMessage> ServerMessageGameStarted::get_draw_message(ClientGameState &client_game_state) {
+    client_game_state.set_players_map(players);
+    client_game_state.set_game_state(GameState::InGame);
+    return client_game_state.get_game_draw_message();
 }
 
 ServerMessageTurn::ServerMessageTurn(std::uint16_t turn, std::vector<std::shared_ptr<Event>> events) : ServerMessage(ServerMessageType::Turn),
@@ -166,7 +148,7 @@ ByteList ServerMessageTurn::serialize() {
     ByteList result;
     result.push_back(server_message_type);
     append_to_vector(result, serialize_uint16(turn));
-    append_to_vector(result, serialize_uint32(events.size()));
+    append_to_vector(result, serialize_uint32(static_cast<std::uint32_t>(events.size())));
 
     for (const auto& event : events) {
         append_to_vector(result, event->serialize());
@@ -175,17 +157,15 @@ ByteList ServerMessageTurn::serialize() {
     return result;
 }
 
-std::string ServerMessageTurn::to_string() {
-    std::stringstream ss;
-    ss << "ServerMessage (Turn): { turn: " << turn << ", events: [\n";
+std::shared_ptr<DrawMessage> ServerMessageTurn::get_draw_message(ClientGameState &client_game_state) {
+    client_game_state.set_turn(turn);
 
     for (const auto& event : events) {
-        ss << "\t\t\t" << event->to_string();
+        event->handle_event(client_game_state);
     }
 
-    ss << "] }\n";
-
-    return ss.str();
+    client_game_state.handle_explosions();
+    return client_game_state.get_game_draw_message();
 }
 
 ServerMessageGameEnded::ServerMessageGameEnded(std::map<PlayerId, Score> scores) : ServerMessage(ServerMessageType::GameEnded),
@@ -202,7 +182,7 @@ ServerMessageGameEnded::ServerMessageGameEnded(TcpBytestream &bytestream) : Serv
 ByteList ServerMessageGameEnded::serialize() {
     ByteList result;
     result.push_back(server_message_type);
-    append_to_vector(result, serialize_uint32(scores.size()));
+    append_to_vector(result, serialize_uint32(static_cast<std::uint32_t>(scores.size())));
 
     for (const auto& score : scores) {
         result.push_back(score.first);
@@ -212,15 +192,8 @@ ByteList ServerMessageGameEnded::serialize() {
     return result;
 }
 
-std::string ServerMessageGameEnded::to_string() {
-    std::stringstream ss;
-    ss << "ServerMessage (GameEnded): { scores_map: [";
-
-    for (const auto& score : scores) {
-        ss << " {" << score.first + 0 << " : " << score.second << "} ";
-    }
-
-    ss << "] }\n";
-
-    return ss.str();
+std::shared_ptr<DrawMessage> ServerMessageGameEnded::get_draw_message(ClientGameState &client_game_state) {
+    client_game_state.set_scores(scores);
+    client_game_state.clear_variables();
+    return client_game_state.get_game_draw_message();
 }

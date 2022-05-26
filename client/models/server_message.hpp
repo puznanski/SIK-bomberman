@@ -10,6 +10,8 @@
 #include "event.hpp"
 #include "../types.hpp"
 #include "../networking/tcp_bytestream.hpp"
+#include "draw_message.hpp"
+#include "../management/client_game_state.hpp"
 
 class ServerMessage {
 public:
@@ -19,14 +21,14 @@ public:
     ServerMessageType server_message_type;
 
     virtual ByteList serialize() = 0;
-    virtual std::string to_string() = 0;
+    virtual std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) = 0;
 };
 
 class ServerMessageHello : public ServerMessage {
 public:
     ServerMessageHello(std::string server_name, std::uint8_t players_count,
                        std::uint16_t size_x, std::uint16_t size_y, std::uint16_t game_length,
-                       std::uint16_t explosion_radius, std::uint16_t bomb_tier);
+                       std::uint16_t explosion_radius, std::uint16_t bomb_timer);
     explicit ServerMessageHello(TcpBytestream &bytestream);
 
     std::string server_name;
@@ -35,10 +37,10 @@ public:
     std::uint16_t size_y;
     std::uint16_t game_length;
     std::uint16_t explosion_radius;
-    std::uint16_t bomb_tier;
+    std::uint16_t bomb_timer;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) override;
 };
 
 class ServerMessageAcceptedPlayer : public ServerMessage {
@@ -50,7 +52,7 @@ public:
     Player player;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) override;
 };
 
 class ServerMessageGameStarted : public ServerMessage {
@@ -61,7 +63,7 @@ public:
     std::map<PlayerId, Player> players;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) override;
 };
 
 class ServerMessageTurn : public ServerMessage {
@@ -73,7 +75,7 @@ public:
     std::vector<std::shared_ptr<Event>> events;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) override;
 };
 
 class ServerMessageGameEnded : public ServerMessage {
@@ -84,7 +86,7 @@ public:
     std::map<PlayerId, Score> scores;
 
     ByteList serialize() override;
-    std::string to_string() override;
+    std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) override;
 };
 
 #endif //ROBOTS_CLIENT_SERVER_MESSAGE_HPP

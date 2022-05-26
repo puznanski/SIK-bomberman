@@ -1,14 +1,11 @@
 #ifndef ROBOTS_CLIENT_GUI_MESSAGE_HPP
 #define ROBOTS_CLIENT_GUI_MESSAGE_HPP
 
-#include <string>
-#include <cstdint>
-#include <map>
-#include <vector>
+#include <memory>
 
 #include "../types.hpp"
-#include "misc.hpp"
 #include "../networking/udp_bytestream.hpp"
+#include "../models/client_message.hpp"
 
 class GuiMessage {
 public:
@@ -17,51 +14,33 @@ public:
 
     GuiMessageType gui_message_type;
 
-    virtual ByteList serialize() = 0;
+    virtual std::shared_ptr<ClientMessage> get_client_message() = 0;
 };
 
-class GuiMessageLobby : public GuiMessage {
+class GuiMessagePlaceBomb : public GuiMessage {
 public:
-    GuiMessageLobby(std::string server_name, std::uint8_t players_count,
-                    std::uint16_t size_x, std::uint16_t size_y, std::uint16_t game_length,
-                    std::uint16_t explosion_radius, std::uint16_t bomb_tier,
-                    std::map<PlayerId, Player> players);
-    explicit GuiMessageLobby(UdpBytestream &bytestream);
+    GuiMessagePlaceBomb() : GuiMessage(GuiMessageType::PlaceBombGui) {}
 
-    std::string server_name;
-    std::uint8_t players_count;
-    std::uint16_t size_x;
-    std::uint16_t size_y;
-    std::uint16_t game_length;
-    std::uint16_t explosion_radius;
-    std::uint16_t bomb_tier;
-    std::map<PlayerId, Player> players;
-
-    ByteList serialize() override;
+    std::shared_ptr<ClientMessage> get_client_message() override;
 };
 
-class GuiMessageGame : public GuiMessage {
+class GuiMessagePlaceBlock : public GuiMessage {
 public:
-    GuiMessageGame(std::string server_name, std::uint16_t size_x, std::uint16_t size_y,
-                   std::uint16_t game_length, std::uint16_t turn, std::map<PlayerId, Player> players,
-                   std::map<PlayerId, Position> player_positions, std::vector<Position> blocks,
-                   std::vector<Bomb> bombs, std::vector<Position> explosions,
-                   std::map<PlayerId, Score> scores);
-    explicit GuiMessageGame(UdpBytestream &bytestream);
+    GuiMessagePlaceBlock() : GuiMessage(GuiMessageType::PlaceBlockGui) {}
 
-    std::string server_name;
-    std::uint16_t size_x;
-    std::uint16_t size_y;
-    std::uint16_t game_length;
-    std::uint16_t turn;
-    std::map<PlayerId, Player> players;
-    std::map<PlayerId, Position> player_positions;
-    std::vector<Position> blocks;
-    std::vector<Bomb> bombs;
-    std::vector<Position> explosions;
-    std::map<PlayerId, Score> scores;
+    std::shared_ptr<ClientMessage> get_client_message() override;
+};
 
-    ByteList serialize() override;
+class GuiMessageMove : public GuiMessage {
+public:
+    explicit GuiMessageMove(Direction direction) : GuiMessage(GuiMessageType::MoveGui), direction(direction) {}
+    explicit GuiMessageMove(UdpBytestream& bytestream);
+
+private:
+    Direction direction;
+
+public:
+    std::shared_ptr<ClientMessage> get_client_message() override;
 };
 
 #endif //ROBOTS_CLIENT_GUI_MESSAGE_HPP
