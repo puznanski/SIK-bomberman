@@ -5,11 +5,11 @@ Pytania proszę wysyłać na adres agluszak@mimuw.edu.pl.
 
 Historia zmian:
 - **25.05.2023** - Doprecyzowanie, kiedy wysyłane są komunikaty do GUI:
-  Po Turn - Game
-  Po AcceptedPlayer, GameEnded i Hello - Lobby
-  Po GameStarted - nic
-
-  A wszystkie pozycje początkowe graczy i bloków są wysyłane w turze 0.
+     * Po Turn - Game
+     * Po AcceptedPlayer, GameEnded i Hello - Lobby
+     * Po GameStarted - nic
+ 
+    A wszystkie pozycje początkowe graczy i bloków są wysyłane w turze 0.
 
 - **24.05.2022** - Wycofanie poniższego (nie będziemy osobno oceniać jakości kodu po pierwszej części)
 - **23.05.2022** - Przy oddawaniu klienta pliki (lub ich części) dotyczące serwera zostaną uznane za zbędne
