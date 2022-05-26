@@ -6,7 +6,7 @@
 
 class ClientOptionsException : public std::exception {
 public:
-    const char* what() const noexcept override {
+    [[nodiscard]] const char* what() const noexcept override {
         return "Wrong parameters passed\n";
     }
 };
@@ -29,13 +29,13 @@ private:
 public:
     void parse_options(int argc, char** argv);
 
-    const std::string &get_help_message() const;
-    const std::string &get_player_name() const;
-    std::uint16_t get_port() const;
-    const std::string &get_server_address_host_name() const;
-    const std::string &get_server_address_port() const;
-    const std::string &get_gui_address_host_name() const;
-    const std::string &get_gui_address_port() const;
+    [[nodiscard]] const std::string &get_help_message() const;
+    [[nodiscard]] const std::string &get_player_name() const;
+    [[nodiscard]] std::uint16_t get_port() const;
+    [[nodiscard]] const std::string &get_server_address_host_name() const;
+    [[nodiscard]] const std::string &get_server_address_port() const;
+    [[nodiscard]] const std::string &get_gui_address_host_name() const;
+    [[nodiscard]] const std::string &get_gui_address_port() const;
 };
 
 #endif //ROBOTS_CLIENT_CLIENT_OPTIONS_HPP

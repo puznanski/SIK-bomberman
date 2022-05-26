@@ -25,7 +25,7 @@ private:
 
     void listen_server();
     void listen_gui();
-    std::shared_ptr<ClientMessage> generate_client_message(UdpBytestream& bytestream);
+    static std::shared_ptr<ClientMessage> generate_client_message(UdpBytestream& bytestream);
     std::shared_ptr<DrawMessage> generate_draw_message(TcpBytestream& bytestream);
 
 public:

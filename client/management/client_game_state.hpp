@@ -39,9 +39,8 @@ private:
     std::set<Position> blocks_destroyed;
 
 public:
-    bool is_in_lobby();
     bool is_game_started();
-    bool is_join_message_sent() const;
+    [[nodiscard]] bool is_join_message_sent() const;
 
     void set_game_state(GameState value);
     void set_join_message_sent(bool value);

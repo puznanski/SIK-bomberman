@@ -5,8 +5,6 @@
 #include <iostream>
 
 #include "../models/server_message.hpp"
-#include "../models/client_message.hpp"
-#include "../models/draw_message.hpp"
 #include "../models/gui_message.hpp"
 
 ClientManager::ClientManager(ClientOptions client_options) : client_options(std::move(client_options)) {

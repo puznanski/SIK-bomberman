@@ -22,7 +22,7 @@ public:
     void get_message();
     ByteList get_bytes(size_t number_of_bytes);
     std::uint8_t get_byte();
-    bool is_buffer_empty() const;
+    [[nodiscard]] bool is_buffer_empty() const;
 };
 
 #endif //ROBOTS_CLIENT_UDP_BYTESTREAM_HPP

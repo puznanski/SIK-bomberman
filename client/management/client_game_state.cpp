@@ -7,11 +7,6 @@ bool ClientGameState::is_game_started() {
     return game_state == GameState::InGame;
 }
 
-bool ClientGameState::is_in_lobby() {
-    std::scoped_lock lock(mutex);
-    return game_state == GameState::InLobby;
-}
-
 bool ClientGameState::is_join_message_sent() const {
     return join_message_sent;
 }
