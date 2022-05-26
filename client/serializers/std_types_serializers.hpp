@@ -15,4 +15,8 @@ std::string deserialize_string(const ByteList& bytes, size_t beg, size_t len);
 std::uint16_t deserialize_uint16(const ByteList& bytes, size_t beg);
 std::uint32_t deserialize_uint32(const ByteList& bytes, size_t beg);
 
+std::string deserialize_string(const ByteList& bytes);
+std::uint16_t deserialize_uint16(const ByteList& bytes);
+std::uint32_t deserialize_uint32(const ByteList& bytes);
+
 #endif //ROBOTS_CLIENT_STD_TYPES_SERIALIZERS_HPP

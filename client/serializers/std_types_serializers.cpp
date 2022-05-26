@@ -74,3 +74,21 @@ std::uint32_t deserialize_uint32(const ByteList& bytes, size_t beg) {
     auto net_val = reinterpret_cast<std::uint32_t*>(&temp);
     return htonl(*net_val);
 }
+
+std::string deserialize_string(const ByteList& bytes) {
+    std::stringstream ss;
+
+    for (const auto& byte : bytes) {
+        ss << byte;
+    }
+
+    return ss.str();
+}
+
+std::uint16_t deserialize_uint16(const ByteList& bytes) {
+    return deserialize_uint16(bytes, 0);
+}
+
+std::uint32_t deserialize_uint32(const ByteList& bytes) {
+    return deserialize_uint32(bytes, 0);
+}

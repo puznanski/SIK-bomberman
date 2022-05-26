@@ -9,6 +9,7 @@
 class Position {
 public:
     Position(std::uint16_t x, std::uint16_t y);
+    Position(const ByteList& message, size_t beg);
 
     std::uint16_t x;
     std::uint16_t y;

@@ -7,6 +7,11 @@
 EventBombPlaced::EventBombPlaced(BombId bomb_id, Position position) : Event(EventType::BombPlaced), bomb_id(bomb_id),
                                                                       position(position) {}
 
+EventBombPlaced::EventBombPlaced(const ByteList& message) : Event(EventType::BombPlaced) {
+    bomb_id = deserialize_uint32(message, 1);
+    position = Position(message, 5);
+}
+
 ByteList EventBombPlaced::serialize() {
     ByteList result;
     result.push_back(event_type);
@@ -30,6 +35,10 @@ std::string EventBombPlaced::to_string() {
 EventBombExploded::EventBombExploded(BombId bomb_id, std::vector<PlayerId> robots_destroyed,
                                      std::vector<Position> blocks_destroyed) : Event(EventType::BombExploded),
                                      bomb_id(bomb_id), robots_destroyed(std::move(robots_destroyed)), blocks_destroyed(std::move(blocks_destroyed)) {}
+
+EventBombExploded::EventBombExploded(const ByteList& message) : Event(EventType::BombExploded) {
+
+}
 
 ByteList EventBombExploded::serialize() {
     ByteList result;

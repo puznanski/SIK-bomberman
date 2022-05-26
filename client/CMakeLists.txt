@@ -13,6 +13,7 @@ add_executable(robots-client client.cpp
         debug_functions.cpp debug_functions.hpp
 
         models/client_message.cpp models/client_message.hpp
+        models/gui_message.cpp models/gui_message.hpp
         models/server_message.cpp models/server_message.hpp
         models/event.cpp models/event.hpp
         models/misc.cpp models/misc.hpp
@@ -20,6 +21,11 @@ add_executable(robots-client client.cpp
         serializers/std_types_serializers.cpp serializers/std_types_serializers.hpp
 
         management/client_options.cpp management/client_options.hpp
+        management/client_manager.cpp management/client_manager.hpp
+        management/client_game_state.cpp management/client_game_state.hpp
+
+        networking/tcp_bytestream.cpp networking/tcp_bytestream.hpp
+        networking/udp_bytestream.cpp networking/udp_bytestream.hpp
 
         types.hpp)
 

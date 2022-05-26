@@ -28,10 +28,10 @@ void print_serialized(const ByteList& x) {
 
 void print_client_params(const ClientOptions& options) {
     print_debug_msg_beg("params");
-    std::cout << "GUI address: " << options.get_gui_address() << "\n";
+    std::cout << "GUI address: " << options.get_gui_address_host_name() << ":" << options.get_gui_address_port() << "\n";
     std::cout << "Player name: " << options.get_player_name() << "\n";
     std::cout << "Port: " << options.get_port() << "\n";
-    std::cout << "Server address: " << options.get_server_address() << "\n";
+    std::cout << "Server address: " << options.get_server_address_host_name() << ":" << options.get_server_address_port() << "\n";
     print_debug_msg_end();
 }
 

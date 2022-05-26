@@ -20,9 +20,10 @@ public:
 class EventBombPlaced : public Event {
 public:
     EventBombPlaced(BombId bomb_id, Position position);
+    explicit EventBombPlaced(const ByteList& message);
 
     BombId bomb_id;
-    Position position;
+    Position position{0, 0};
 
     ByteList serialize() override;
     std::string to_string() override;
@@ -31,6 +32,7 @@ public:
 class EventBombExploded : public Event {
 public:
     EventBombExploded(BombId bomb_id, std::vector<PlayerId> robots_destroyed, std::vector<Position> blocks_destroyed);
+    explicit EventBombExploded(const ByteList& message);
 
     BombId bomb_id;
     std::vector<PlayerId> robots_destroyed;

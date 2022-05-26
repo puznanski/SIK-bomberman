@@ -6,6 +6,11 @@
 
 Position::Position(std::uint16_t x, std::uint16_t y) : x(x), y(y) {}
 
+Position::Position(const ByteList& message, size_t beg) {
+    x = deserialize_uint16(message, beg);
+    y = deserialize_uint16(message, beg + UINT16_SIZE);
+}
+
 ByteList Position::serialize() const {
     ByteList result = serialize_uint16(x);
     ByteList serialized_y = serialize_uint16(y);
