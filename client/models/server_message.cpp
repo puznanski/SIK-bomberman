@@ -195,5 +195,5 @@ ByteList ServerMessageGameEnded::serialize() {
 std::shared_ptr<DrawMessage> ServerMessageGameEnded::get_draw_message(ClientGameState &client_game_state) {
     client_game_state.set_scores(scores);
     client_game_state.clear_variables();
-    return client_game_state.get_game_draw_message();
+    return client_game_state.get_lobby_draw_message();
 }
