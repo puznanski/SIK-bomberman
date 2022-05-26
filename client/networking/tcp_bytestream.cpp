@@ -11,3 +11,7 @@ ByteList TcpBytestream::get_bytes(size_t number_of_bytes) {
     return result;
 }
 
+std::uint8_t TcpBytestream::get_byte() {
+    return get_bytes(1).at(0);
+}
+

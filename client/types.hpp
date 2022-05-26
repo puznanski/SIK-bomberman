@@ -41,4 +41,9 @@ enum ServerMessageType {
     GameEnded = 4
 };
 
+enum GuiMessageType {
+    Lobby = 0,
+    Game = 1
+};
+
 #endif //ROBOTS_CLIENT_TYPES_HPP

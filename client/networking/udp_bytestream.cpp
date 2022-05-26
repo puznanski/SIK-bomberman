@@ -24,6 +24,10 @@ ByteList UdpBytestream::get_bytes(size_t number_of_bytes) {
     return result;
 }
 
+std::uint8_t UdpBytestream::get_byte() {
+    return get_bytes(1).at(0);
+}
+
 bool UdpBytestream::is_buffer_empty() const {
     return bytes_received < buffer_iterator;
 }

@@ -7,9 +7,9 @@
 EventBombPlaced::EventBombPlaced(BombId bomb_id, Position position) : Event(EventType::BombPlaced), bomb_id(bomb_id),
                                                                       position(position) {}
 
-EventBombPlaced::EventBombPlaced(const ByteList& message) : Event(EventType::BombPlaced) {
-    bomb_id = deserialize_uint32(message, 1);
-    position = Position(message, 5);
+EventBombPlaced::EventBombPlaced(TcpBytestream& bytestream) : Event(EventType::BombPlaced) {
+    bomb_id = deserialize_uint32(bytestream.get_bytes(UINT32_SIZE));
+    position = Position(bytestream);
 }
 
 ByteList EventBombPlaced::serialize() {
@@ -36,8 +36,21 @@ EventBombExploded::EventBombExploded(BombId bomb_id, std::vector<PlayerId> robot
                                      std::vector<Position> blocks_destroyed) : Event(EventType::BombExploded),
                                      bomb_id(bomb_id), robots_destroyed(std::move(robots_destroyed)), blocks_destroyed(std::move(blocks_destroyed)) {}
 
-EventBombExploded::EventBombExploded(const ByteList& message) : Event(EventType::BombExploded) {
+EventBombExploded::EventBombExploded(TcpBytestream& bytestream) : Event(EventType::BombExploded) {
+    bomb_id = deserialize_uint32(bytestream.get_bytes(UINT32_SIZE));
+    size_t robots_destroyed_size = deserialize_uint32(bytestream.get_bytes(UINT32_SIZE));
+    robots_destroyed.reserve(robots_destroyed_size);
 
+    for (size_t i = 0; i < robots_destroyed_size; i++) {
+        robots_destroyed.push_back(bytestream.get_byte());
+    }
+
+    size_t blocks_destroyed_size = deserialize_uint32(bytestream.get_bytes(UINT32_SIZE));
+    blocks_destroyed.reserve(blocks_destroyed_size);
+
+    for (size_t i = 0; i < blocks_destroyed_size; i++) {
+        blocks_destroyed.emplace_back(bytestream);
+    }
 }
 
 ByteList EventBombExploded::serialize() {
@@ -84,6 +97,11 @@ std::string EventBombExploded::to_string() {
 
 EventPlayerMoved::EventPlayerMoved(PlayerId id, Position position) : Event(EventType::PlayerMoved), id(id), position(position) {}
 
+EventPlayerMoved::EventPlayerMoved(TcpBytestream &bytestream) : Event(EventType::PlayerMoved) {
+    id = bytestream.get_byte();
+    position = Position(bytestream);
+}
+
 ByteList EventPlayerMoved::serialize() {
     ByteList result;
     result.push_back(event_type);
@@ -103,6 +121,8 @@ std::string EventPlayerMoved::to_string() {
 }
 
 EventBlockPlaced::EventBlockPlaced(Position position) : Event(EventType::BlockPlaced), position(position) {}
+
+EventBlockPlaced::EventBlockPlaced(TcpBytestream& bytestream) : Event(EventType::BlockPlaced), position(Position(bytestream)) {}
 
 ByteList EventBlockPlaced::serialize() {
     ByteList result;

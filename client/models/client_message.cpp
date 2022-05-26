@@ -5,10 +5,6 @@
 
 #include "../serializers/std_types_serializers.hpp"
 
-ClientMessage::ClientMessage(const ByteList& message) {
-    client_message_type = static_cast<ClientMessageType>(message[0]);
-}
-
 ByteList ClientMessage::serialize() {
     ByteList result;
     result.reserve(1);
@@ -16,8 +12,8 @@ ByteList ClientMessage::serialize() {
     return result;
 }
 
-ClientMessageJoin::ClientMessageJoin(const ByteList &message) : ClientMessage(ClientMessageType::Join) {
-    name = deserialize_string(message, 2, message[1]);
+ClientMessageJoin::ClientMessageJoin(TcpBytestream& bytestream) : ClientMessage(ClientMessageType::Join) {
+    name = deserialize_string(bytestream.get_bytes(bytestream.get_byte()));
 }
 
 ByteList ClientMessageJoin::serialize() {
@@ -33,8 +29,8 @@ ByteList ClientMessageJoin::serialize() {
     return result;
 }
 
-ClientMessageMove::ClientMessageMove(const ByteList &message) : ClientMessage(ClientMessageType::Move) {
-    direction = static_cast<Direction>(message[1]);
+ClientMessageMove::ClientMessageMove(TcpBytestream& bytestream) : ClientMessage(ClientMessageType::Move) {
+    direction = static_cast<Direction>(bytestream.get_byte());
 }
 
 ByteList ClientMessageMove::serialize() {

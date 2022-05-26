@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../types.hpp"
+#include "../networking/tcp_bytestream.hpp"
 #include "misc.hpp"
 
 class Event {
@@ -20,7 +21,7 @@ public:
 class EventBombPlaced : public Event {
 public:
     EventBombPlaced(BombId bomb_id, Position position);
-    explicit EventBombPlaced(const ByteList& message);
+    explicit EventBombPlaced(TcpBytestream& bytestream);
 
     BombId bomb_id;
     Position position{0, 0};
@@ -32,7 +33,7 @@ public:
 class EventBombExploded : public Event {
 public:
     EventBombExploded(BombId bomb_id, std::vector<PlayerId> robots_destroyed, std::vector<Position> blocks_destroyed);
-    explicit EventBombExploded(const ByteList& message);
+    explicit EventBombExploded(TcpBytestream& bytestream);
 
     BombId bomb_id;
     std::vector<PlayerId> robots_destroyed;
@@ -45,6 +46,7 @@ public:
 class EventPlayerMoved : public Event {
 public:
     EventPlayerMoved(PlayerId id, Position position);
+    explicit EventPlayerMoved(TcpBytestream& bytestream);
 
     PlayerId id;
     Position position;
@@ -55,7 +57,8 @@ public:
 
 class EventBlockPlaced : public Event {
 public:
-    EventBlockPlaced(Position position);
+    explicit EventBlockPlaced(Position position);
+    explicit EventBlockPlaced(TcpBytestream& bytestream);
 
     Position position;
 

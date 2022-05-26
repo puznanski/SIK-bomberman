@@ -7,12 +7,12 @@
 #include <cstdint>
 
 #include "../types.hpp"
+#include "../networking/tcp_bytestream.hpp"
 
 class ClientMessage {
 public:
     virtual ~ClientMessage() = default;
     explicit ClientMessage(ClientMessageType client_message_type) : client_message_type(client_message_type) {}
-    explicit ClientMessage(const ByteList& message);
 
     ClientMessageType client_message_type{};
 
@@ -25,7 +25,7 @@ public:
 class ClientMessageJoin : public ClientMessage {
 public:
     explicit ClientMessageJoin(std::string name) : ClientMessage(ClientMessageType::Join), name(std::move(name)) {}
-    explicit ClientMessageJoin(const ByteList& message);
+    explicit ClientMessageJoin(TcpBytestream& bytestream);
 
     std::string name;
 
@@ -38,7 +38,7 @@ public:
 class ClientMessageMove : public ClientMessage {
 public:
     explicit ClientMessageMove(Direction direction) : ClientMessage(ClientMessageType::Move), direction(direction) {}
-    explicit ClientMessageMove(const ByteList& message);
+    explicit ClientMessageMove(TcpBytestream& bytestream);
 
     Direction direction;
 
