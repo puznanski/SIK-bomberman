@@ -22,6 +22,7 @@ int main(int argc, char** argv) {
 
     try {
         ClientManager client_manager(client_options);
+        client_manager.listen_all();
     }
     catch (const std::exception &e) {
         std::cerr << e.what() << "\n";

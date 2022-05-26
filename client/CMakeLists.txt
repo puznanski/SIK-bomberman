@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.18)
 project(robots-client)
 
+cmake_host_system_information(RESULT host_name QUERY HOSTNAME)
+message("Hostname: " ${host_name})
+
+if(${host_name} STREQUAL "students")
+        set(LD_LIBRARY_PATH "/opt/gcc-11.2/lib64")
+        set(CMAKE_CXX_COMPILER "/opt/gcc-11.2/bin/g++-11.2")
+else()
+        set(CMAKE_CXX_COMPILER "/usr/bin/g++-11")
+endif()
+
 set(Boost_INCLUDE_DIR /usr/include/boost)
 set(Boost_LIBRARY_DIR /usr/lib/x86_64-linux-gnu)
 set(CMAKE_CXX_STANDARD 20)
@@ -24,7 +34,6 @@ add_executable(robots-client client.cpp
         management/client_options.cpp management/client_options.hpp
         management/client_manager.cpp management/client_manager.hpp
         management/client_game_state.cpp management/client_game_state.hpp
-        management/game_handlers.cpp management/game_handlers.hpp
 
         networking/tcp_bytestream.cpp networking/tcp_bytestream.hpp
         networking/udp_bytestream.cpp networking/udp_bytestream.hpp

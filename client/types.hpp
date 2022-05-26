@@ -62,7 +62,8 @@ class UdpWrongMessageException : public std::exception {
 };
 
 class TcpWrongMessageException : public std::exception {
-
+public:
+    const char* what() const noexcept {return "Wrong TCP message";}
 };
 
 #endif //ROBOTS_CLIENT_TYPES_HPP
