@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.18)
 project(robots)
 
+cmake_host_system_information(RESULT host_name QUERY HOSTNAME)
+message("Hostname: " ${host_name})
+
+if(${host_name} STREQUAL "students")
+        set(LD_LIBRARY_PATH "/opt/gcc-11.2/lib64")
+        set(CMAKE_CXX_COMPILER "/opt/gcc-11.2/bin/g++-11.2")
+else()
+        set(CMAKE_CXX_COMPILER "/usr/bin/g++-11")
+endif()
+
 set(Boost_INCLUDE_DIR /usr/include/boost)
 set(Boost_LIBRARY_DIR /usr/lib/x86_64-linux-gnu)
 set(CMAKE_CXX_STANDARD 20)
