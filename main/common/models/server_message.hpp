@@ -11,7 +11,7 @@
 #include "../types.hpp"
 #include "../networking/tcp_bytestream.hpp"
 #include "draw_message.hpp"
-#include "../management/client_game_state.hpp"
+#include "../../client/client_game_state.hpp"
 
 class ServerMessage {
 public:

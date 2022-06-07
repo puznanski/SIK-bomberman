@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include "management/client_options.hpp"
-#include "management/client_manager.hpp"
+#include "client_options.hpp"
+#include "client_manager.hpp"
 
 int main(int argc, char** argv) {
     ClientOptions client_options;

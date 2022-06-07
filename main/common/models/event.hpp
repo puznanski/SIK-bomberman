@@ -5,7 +5,7 @@
 
 #include "../types.hpp"
 #include "../networking/tcp_bytestream.hpp"
-#include "../management/client_game_state.hpp"
+#include "../../client/client_game_state.hpp"
 #include "misc.hpp"
 
 class Event {

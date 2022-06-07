@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 
-#include "../models/draw_message.hpp"
+#include "../common/models/draw_message.hpp"
 
 class ServerMessageHello;
 

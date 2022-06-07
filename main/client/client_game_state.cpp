@@ -1,6 +1,6 @@
 #include "client_game_state.hpp"
 
-#include "../models/server_message.hpp"
+#include "../common/models/server_message.hpp"
 
 bool ClientGameState::is_game_started() {
     std::scoped_lock lock(mutex);

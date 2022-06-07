@@ -6,10 +6,10 @@
 
 #include "client_options.hpp"
 #include "client_game_state.hpp"
-#include "../networking/tcp_bytestream.hpp"
-#include "../networking/udp_bytestream.hpp"
-#include "../models/client_message.hpp"
-#include "../models/draw_message.hpp"
+#include "../common/networking/tcp_bytestream.hpp"
+#include "../common/networking/udp_bytestream.hpp"
+#include "../common/models/client_message.hpp"
+#include "../common/models/draw_message.hpp"
 
 class ClientManager {
 public:

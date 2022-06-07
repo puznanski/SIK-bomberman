@@ -5,7 +5,7 @@
 
 #include "../types.hpp"
 #include "../networking/udp_bytestream.hpp"
-#include "../models/client_message.hpp"
+#include "client_message.hpp"
 
 class GuiMessage {
 public:
