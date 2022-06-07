@@ -7,11 +7,6 @@ bool ClientGameState::is_game_started() {
     return game_state == GameState::InGame;
 }
 
-bool ClientGameState::is_in_lobby() {
-    std::scoped_lock lock(mutex);
-    return game_state == GameState::InLobby;
-}
-
 bool ClientGameState::is_join_message_sent() const {
     return join_message_sent;
 }
@@ -57,6 +52,10 @@ std::shared_ptr<DrawMessage> ClientGameState::get_game_draw_message() {
 
 void ClientGameState::set_players_map(const std::map<PlayerId, Player> &value) {
     players = value;
+    
+    for (const auto& player : players) {
+        scores.insert({player.first, 0});
+    }
 }
 
 void ClientGameState::add_bomb(BombId id, const Position &position) {
@@ -84,6 +83,10 @@ void ClientGameState::add_block(const Position &block_position) {
 
 void ClientGameState::set_turn(std::uint16_t value) {
     turn = value;
+
+    for (auto &bomb : bombs) {
+        bomb.second.timer--;
+    }
 }
 
 void ClientGameState::set_game_state(GameState value) {
@@ -93,6 +96,7 @@ void ClientGameState::set_game_state(GameState value) {
 
 void ClientGameState::clear_variables() {
     set_game_state(GameState::InLobby);
+    join_message_sent = false;
     players.clear();
     turn = 0;
     player_positions.clear();
@@ -112,45 +116,47 @@ void ClientGameState::handle_explosions() {
         auto bomb_position = bombs.at(bomb).position;
         explosions.insert(bomb_position);
 
-        std::uint16_t range = static_cast<std::uint16_t>(std::max(0, bomb_position.x - explosion_radius + 1));
+        auto range = static_cast<std::int32_t>(std::max(0, bomb_position.x - explosion_radius));
 
-        for (std::uint16_t x = bomb_position.x; x >= range; x--) {
-            Position current_position = {x, bomb_position.y};
-            if (blocks.contains(current_position)) {
-                explosions.insert(current_position);
-                break;
-            }
+        for (std::int32_t x = bomb_position.x; x >= range; x--) {
+            Position current_position = {static_cast<std::uint16_t>(x), bomb_position.y};
+            explosions.insert(current_position);
+            if (blocks.contains(current_position)) break;
         }
 
-        range = static_cast<std::uint16_t>(std::max(static_cast<std::int32_t>(size_x), bomb_position.x + explosion_radius - 1));
+        range = static_cast<std::int32_t>(std::min(static_cast<std::int32_t>(size_x - 1), bomb_position.x + explosion_radius));
 
-        for (std::uint16_t x = bomb_position.x; x <= range; x++) {
-            Position current_position = {x, bomb_position.y};
-            if (blocks.contains(current_position)) {
-                explosions.insert(current_position);
-                break;
-            }
+        for (std::int32_t x = bomb_position.x; x <= range; x++) {
+            Position current_position = {static_cast<std::uint16_t>(x), bomb_position.y};
+            explosions.insert(current_position);
+            if (blocks.contains(current_position)) break;
         }
 
-        range = static_cast<std::uint16_t>(std::max(0, bomb_position.y - explosion_radius + 1));
+        range = static_cast<std::int32_t>(std::max(0, bomb_position.y - explosion_radius));
 
-        for (std::uint16_t y = bomb_position.y; y >= range; y--) {
-            Position current_position = {bomb_position.x, y};
-            if (blocks.contains(current_position)) {
-                explosions.insert(current_position);
-                break;
-            }
+        for (std::int32_t y = bomb_position.y; y >= range; y--) {
+            Position current_position = {bomb_position.x, static_cast<std::uint16_t>(y)};
+            explosions.insert(current_position);
+            if (blocks.contains(current_position)) break;
         }
 
-        range = static_cast<std::uint16_t>(std::max(static_cast<std::int32_t>(size_y), bomb_position.y + explosion_radius - 1));
+        range = static_cast<std::int32_t>(std::min(static_cast<std::int32_t>(size_y - 1), bomb_position.y + explosion_radius));
 
-        for (std::uint16_t y = bomb_position.y; y <= range; y++) {
-            Position current_position = {bomb_position.x, y};
-            if (blocks.contains(current_position)) {
-                explosions.insert(current_position);
-                break;
-            }
+        for (std::int32_t y = bomb_position.y; y <= range; y++) {
+            Position current_position = {bomb_position.x, static_cast<std::uint16_t>(y)};
+            explosions.insert(current_position);
+            if (blocks.contains(current_position)) break;
         }
+
+        bombs.erase(bomb);
+    }
+
+    for (const auto& player : robots_destroyed) {
+        scores.at(player)++; 
+    }
+
+    for (auto block : blocks_destroyed) {
+        blocks.erase(block);
     }
 
     bombs_exploded.clear();

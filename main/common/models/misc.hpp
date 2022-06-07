@@ -18,7 +18,7 @@ public:
     std::uint16_t x;
     std::uint16_t y;
 
-    ByteList serialize() const;
+    [[nodiscard]] ByteList serialize() const;
     bool operator<(const Position &rhs) const;
 };
 
@@ -31,7 +31,7 @@ public:
     Position position{};
     std::uint16_t timer;
 
-    ByteList serialize() const;
+    [[nodiscard]] ByteList serialize() const;
 };
 
 class Player {
@@ -44,7 +44,7 @@ public:
     std::string name;
     std::string address;
 
-    ByteList serialize() const;
+    [[nodiscard]] ByteList serialize() const;
 };
 
 void append_to_vector(ByteList& dest, const ByteList& src);

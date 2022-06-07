@@ -109,7 +109,7 @@ ByteList ServerMessageGameStarted::serialize() {
 std::shared_ptr<DrawMessage> ServerMessageGameStarted::get_draw_message(ClientGameState &client_game_state) {
     client_game_state.set_players_map(players);
     client_game_state.set_game_state(GameState::InGame);
-    return client_game_state.get_game_draw_message();
+    return nullptr;
 }
 
 ServerMessageTurn::ServerMessageTurn(std::uint16_t turn, std::vector<std::shared_ptr<Event>> events) : ServerMessage(ServerMessageType::Turn),
@@ -195,5 +195,5 @@ ByteList ServerMessageGameEnded::serialize() {
 std::shared_ptr<DrawMessage> ServerMessageGameEnded::get_draw_message(ClientGameState &client_game_state) {
     client_game_state.set_scores(scores);
     client_game_state.clear_variables();
-    return client_game_state.get_game_draw_message();
+    return client_game_state.get_lobby_draw_message();
 }

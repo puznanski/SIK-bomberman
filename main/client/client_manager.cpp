@@ -5,20 +5,19 @@
 #include <iostream>
 
 #include "../common/models/server_message.hpp"
-#include "../common/models/client_message.hpp"
-#include "../common/models/draw_message.hpp"
 #include "../common/models/gui_message.hpp"
 
 ClientManager::ClientManager(ClientOptions client_options) : client_options(std::move(client_options)) {
     boost::asio::ip::tcp::resolver tcp_resolver(io_context);
     auto tcp_endpoint = tcp_resolver.resolve(this->client_options.get_server_address_host_name(), this->client_options.get_server_address_port());
     tcp_socket = std::make_shared<boost::asio::ip::tcp::socket>(io_context);
-    tcp_socket->set_option(boost::asio::ip::tcp::no_delay(true));
     boost::asio::connect(*tcp_socket, tcp_endpoint);
+    tcp_socket->set_option(boost::asio::ip::tcp::no_delay(true));
 
+
+    udp_socket = std::make_shared<boost::asio::ip::udp::socket>(io_context, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v6(), client_options.get_port()));
     boost::asio::ip::udp::resolver udp_resolver(io_context);
     udp_endpoint = *(udp_resolver.resolve(this->client_options.get_gui_address_host_name(), this->client_options.get_gui_address_port()).begin());
-    udp_socket = std::make_shared<boost::asio::ip::udp::socket>(io_context);
 }
 
 void ClientManager::listen_all() {
@@ -32,8 +31,11 @@ void ClientManager::listen_server() {
     while (true) {
         try {
             auto draw_message = generate_draw_message(tcp_bytestream);
-            ByteList serialized_draw_message = draw_message->serialize();
-            udp_socket->send_to(boost::asio::buffer(serialized_draw_message), udp_endpoint);
+
+            if (draw_message != nullptr) {
+                ByteList serialized_draw_message = draw_message->serialize();
+                udp_socket->send_to(boost::asio::buffer(serialized_draw_message), udp_endpoint);
+            }
         }
         catch (const std::exception& e) {
             std::cerr << e.what() << "\n";

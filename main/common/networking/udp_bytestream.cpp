@@ -13,7 +13,7 @@ void UdpBytestream::get_message() {
 ByteList UdpBytestream::get_bytes(size_t number_of_bytes) {
     ByteList result(number_of_bytes);
 
-    if (number_of_bytes > bytes_received - buffer_iterator) throw std::exception();
+    if (number_of_bytes > bytes_received - buffer_iterator) throw UdpWrongMessageException();
 
     for (size_t i = 0; i < number_of_bytes; i++) {
         result[i] = buffer[i + buffer_iterator];
@@ -29,5 +29,5 @@ std::uint8_t UdpBytestream::get_byte() {
 }
 
 bool UdpBytestream::is_buffer_empty() const {
-    return bytes_received < buffer_iterator;
+    return bytes_received <= buffer_iterator;
 }
