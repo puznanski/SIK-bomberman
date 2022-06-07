@@ -1,6 +1,7 @@
 #ifndef ROBOTS_CLIENT_CLIENT_OPTIONS_HPP
 #define ROBOTS_CLIENT_CLIENT_OPTIONS_HPP
 
+#include <exception>
 #include <string>
 #include <cstdint>
 

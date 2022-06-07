@@ -2,6 +2,7 @@
 
 #include <boost/program_options.hpp>
 #include <sstream>
+#include <limits>
 
 namespace po = boost::program_options;
 

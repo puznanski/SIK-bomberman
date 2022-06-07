@@ -43,7 +43,10 @@ add_executable(robots-client client/client.cpp
 TARGET_INCLUDE_DIRECTORIES(robots-client PRIVATE ${Boost_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(robots-client LINK_PUBLIC ${Boost_LIBRARIES})
 
-add_executable(robots-server server/server.cpp)
+add_executable(robots-server server/server.cpp
+
+        server/server_options.cpp server/server_options.hpp
+        server/server_manager.cpp server/server_manager.hpp)
 
 TARGET_INCLUDE_DIRECTORIES(robots-server PRIVATE ${Boost_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(robots-server LINK_PUBLIC ${Boost_LIBRARIES})
