@@ -11,8 +11,6 @@
 #include "server_options.hpp"
 #include "../common/models/misc.hpp"
 #include "../common/models/turn.hpp"
-#include "../common/models/server_message.hpp"
-#include "../common/models/client_message.hpp"
 #include "../common/models/player_movement.hpp"
 
 class ServerGameState {
@@ -24,7 +22,6 @@ private:
     std::map<PlayerId, Player> players;
     std::minstd_rand random_generator;
 
-    bool is_game_started = false;
     Turn current_turn;
     std::vector<Turn> turns;
     std::map<PlayerId, Position> player_positions;
@@ -42,8 +39,8 @@ private:
     std::pair<bool, Position> handle_move(const Position &old_position, Direction direction);
 
 public:
-    ServerMessageTurn initialize_game(std::map<PlayerId, Player> players_map);
-    ServerMessageTurn handle_turn(std::map<PlayerId, PlayerMovement> player_movements);
+    Turn initialize_game(std::map<PlayerId, Player> players_map);
+    Turn handle_turn(std::map<PlayerId, PlayerMovement> player_movements);
 };
 
 #endif //ROBOTS_SERVER_GAME_STATE_HPP

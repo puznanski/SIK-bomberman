@@ -6,7 +6,7 @@ ServerGameState::ServerGameState(ServerOptions server_options) : server_options(
     random_generator = std::minstd_rand(server_options.get_seed());
 }
 
-ServerMessageTurn ServerGameState::initialize_game(std::map<PlayerId, Player> players_map) {
+Turn ServerGameState::initialize_game(std::map<PlayerId, Player> players_map) {
     turns.clear();
     player_positions.clear();
     scores.clear();
@@ -31,10 +31,10 @@ ServerMessageTurn ServerGameState::initialize_game(std::map<PlayerId, Player> pl
 
     current_turn = Turn(0, events);
     turns.push_back(current_turn);
-    return ServerMessageTurn(current_turn);
+    return current_turn;
 }
 
-ServerMessageTurn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_movements) {
+Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_movements) {
     robots_destroyed.clear();
     blocks_destroyed.clear();
     std::vector<std::shared_ptr<Event>> events;
@@ -122,7 +122,7 @@ ServerMessageTurn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement
 
     current_turn = Turn(current_turn.turn_number + 1, events);
     turns.push_back(current_turn);
-    return ServerMessageTurn(current_turn);
+    return current_turn;
 }
 
 Position ServerGameState::get_random_position() {
