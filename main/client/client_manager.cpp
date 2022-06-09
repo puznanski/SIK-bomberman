@@ -105,23 +105,23 @@ std::shared_ptr<DrawMessage> ClientManager::generate_draw_message(TcpBytestream 
     std::shared_ptr<ServerMessage> server_message;
 
     switch (server_message_type) {
-        case Hello: {
+        case HelloMsg: {
             server_message = std::make_shared<ServerMessageHello>(bytestream);
             break;
         }
-        case AcceptedPlayer: {
+        case AcceptedPlayerMsg: {
             server_message = std::make_shared<ServerMessageAcceptedPlayer>(bytestream);
             break;
         }
-        case GameStarted: {
+        case GameStartedMsg: {
             server_message = std::make_shared<ServerMessageGameStarted>(bytestream);
             break;
         }
-        case Turn: {
+        case TurnMsg: {
             server_message = std::make_shared<ServerMessageTurn>(bytestream);
             break;
         }
-        case GameEnded: {
+        case GameEndedMsg: {
             server_message = std::make_shared<ServerMessageGameEnded>(bytestream);
             break;
         }

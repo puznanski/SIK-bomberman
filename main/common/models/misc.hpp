@@ -20,6 +20,8 @@ public:
 
     [[nodiscard]] ByteList serialize() const;
     bool operator<(const Position &rhs) const;
+    bool operator==(const Position &rhs) const;
+    bool operator!=(const Position &rhs) const;
 };
 
 class Bomb {

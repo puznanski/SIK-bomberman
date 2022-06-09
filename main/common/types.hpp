@@ -34,11 +34,11 @@ enum EventType {
 };
 
 enum ServerMessageType {
-    Hello = 0,
-    AcceptedPlayer = 1,
-    GameStarted = 2,
-    Turn = 3,
-    GameEnded = 4
+    HelloMsg = 0,
+    AcceptedPlayerMsg = 1,
+    GameStartedMsg = 2,
+    TurnMsg = 3,
+    GameEndedMsg = 4
 };
 
 enum DrawMessageType {

@@ -12,6 +12,7 @@
 #include "../networking/tcp_bytestream.hpp"
 #include "draw_message.hpp"
 #include "../../client/client_game_state.hpp"
+#include "turn.hpp"
 
 class ServerMessage {
 public:
@@ -68,11 +69,10 @@ public:
 
 class ServerMessageTurn : public ServerMessage {
 public:
-    ServerMessageTurn(std::uint16_t turn, std::vector<std::shared_ptr<Event>> events);
+    explicit ServerMessageTurn(Turn turn);
     explicit ServerMessageTurn(TcpBytestream &bytestream);
 
-    std::uint16_t turn;
-    std::vector<std::shared_ptr<Event>> events;
+    class Turn turn;
 
     ByteList serialize() override;
     std::shared_ptr<DrawMessage> get_draw_message(ClientGameState &client_game_state) override;
