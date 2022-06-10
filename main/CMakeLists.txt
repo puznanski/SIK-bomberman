@@ -62,6 +62,9 @@ add_executable(robots-server server/server.cpp
         server/server_options.cpp server/server_options.hpp
         server/server_manager.cpp server/server_manager.hpp
         server/server_game_state.cpp server/server_game_state.hpp
+        server/server_message_sender.cpp server/server_message_sender.hpp
+        server/game_client.cpp server/game_client.hpp
+        server/server_lobby.cpp server/server_lobby.hpp
 
         common/types.hpp)
 

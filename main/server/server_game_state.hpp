@@ -19,7 +19,6 @@ public:
 
 private:
     ServerOptions server_options;
-    std::map<PlayerId, Player> players;
     std::minstd_rand random_generator;
 
     Turn current_turn;
@@ -27,7 +26,7 @@ private:
     std::map<PlayerId, Position> player_positions;
     std::map<PlayerId, Score> scores;
     std::map<BombId, Bomb> bombs;
-    BombId next_bomb_id;
+    BombId next_bomb_id{};
     std::set<Position> blocks;
 
     std::vector<PlayerId> robots_destroyed;
@@ -39,8 +38,9 @@ private:
     std::pair<bool, Position> handle_move(const Position &old_position, Direction direction);
 
 public:
-    Turn initialize_game(std::map<PlayerId, Player> players_map);
+    Turn initialize_game(const std::vector<PlayerId>& players);
     Turn handle_turn(std::map<PlayerId, PlayerMovement> player_movements);
+    std::vector<Turn> get_turns();
 };
 
 #endif //ROBOTS_SERVER_GAME_STATE_HPP

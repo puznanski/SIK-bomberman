@@ -25,10 +25,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::cout << server_options.to_string();
-
     try {
         ServerManager server_manager(server_options);
+        server_manager.start();
     }
     catch (const std::exception &e) {
         std::cerr << e.what() << "\n";

@@ -15,7 +15,7 @@ ClientManager::ClientManager(ClientOptions client_options) : client_options(std:
     tcp_socket->set_option(boost::asio::ip::tcp::no_delay(true));
 
 
-    udp_socket = std::make_shared<boost::asio::ip::udp::socket>(io_context, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v6(), client_options.get_port()));
+    udp_socket = std::make_shared<boost::asio::ip::udp::socket>(io_context, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v6(), this->client_options.get_port()));
     boost::asio::ip::udp::resolver udp_resolver(io_context);
     udp_endpoint = *(udp_resolver.resolve(this->client_options.get_gui_address_host_name(), this->client_options.get_gui_address_port()).begin());
 }

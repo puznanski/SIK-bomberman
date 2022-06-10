@@ -3,24 +3,24 @@
 #include <memory>
 
 ServerGameState::ServerGameState(ServerOptions server_options) : server_options(std::move(server_options)) {
-    random_generator = std::minstd_rand(server_options.get_seed());
+    random_generator = std::minstd_rand(this->server_options.get_seed());
 }
 
-Turn ServerGameState::initialize_game(std::map<PlayerId, Player> players_map) {
+Turn ServerGameState::initialize_game(const std::vector<PlayerId>& players) {
     turns.clear();
     player_positions.clear();
     scores.clear();
     bombs.clear();
     next_bomb_id = 0;
     blocks.clear();
-    players = std::move(players_map);
 
     std::vector<std::shared_ptr<Event>> events;
 
     for (auto const& player : players) {
         Position position = get_random_position();
-        player_positions.insert({player.first, position});
-        events.push_back(std::make_shared<EventPlayerMoved>(player.first, position));
+        player_positions.insert({player, position});
+        scores.insert({player, 0});
+        events.push_back(std::make_shared<EventPlayerMoved>(player, position));
     }
 
     for (std::uint16_t i = 0; i < server_options.get_initial_blocks(); i++) {
@@ -39,6 +39,7 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
     blocks_destroyed.clear();
     std::vector<std::shared_ptr<Event>> events;
     std::set<PlayerId> all_destroyed_robots;
+    std::set<Position> all_destroyed_blocks;
     auto explosion_radius = server_options.get_explosion_radius();
     auto bomb_it = bombs.begin();
 
@@ -81,6 +82,7 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
             }
 
             all_destroyed_robots.insert(robots_destroyed.begin(), robots_destroyed.end());
+            all_destroyed_blocks.insert(blocks_destroyed.begin(), blocks_destroyed.end());
             events.push_back(std::make_shared<EventBombExploded>(bomb_it->first, robots_destroyed, blocks_destroyed));
             bomb_it = bombs.erase(bomb_it);
             robots_destroyed.clear();
@@ -91,10 +93,15 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
         }
     }
 
+    for (auto const& block : all_destroyed_blocks) {
+        blocks.erase(block);
+    }
+
     for (auto player : player_positions) {
         if (all_destroyed_robots.contains(player.first)) {
             Position new_position = get_random_position();
             player.second = new_position;
+            scores.at(player.first)++;
             events.push_back(std::make_shared<EventPlayerMoved>(player.first, new_position));
         }
         else {
@@ -136,7 +143,6 @@ bool ServerGameState::handle_explosion(Position position) {
     }
 
     if (blocks.contains(position)) {
-        blocks.erase(position);
         blocks_destroyed.push_back(position);
         return true;
     }
@@ -151,33 +157,36 @@ std::pair<bool, Position> ServerGameState::handle_move(const Position &old_posit
     switch (direction) {
         case Up: {
             if (old_position.y != server_options.get_size_y()) {
-                has_moved = true;
                 position = Position(old_position.x, old_position.y + 1);
             }
             break;
         }
         case Right: {
             if (old_position.x != server_options.get_size_x()) {
-                has_moved = true;
                 position = Position(old_position.x + 1, old_position.y);
             }
             break;
         }
         case Down: {
             if (old_position.y != 0) {
-                has_moved = true;
                 position = Position(old_position.x, old_position.y - 1);
             }
             break;
         }
         case Left: {
             if (old_position.x != 0) {
-                has_moved = true;
                 position = Position(old_position.x - 1, old_position.y);
             }
             break;
         }
     }
 
+    if (blocks.contains(position)) position = old_position;
+    else has_moved = true;
+
     return {has_moved, position};
+}
+
+std::vector<Turn> ServerGameState::get_turns() {
+    return turns;
 }

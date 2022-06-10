@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <utility>
+#include <thread>
 
 #include "server_options.hpp"
 #include "server_game_state.hpp"
@@ -14,6 +15,9 @@ public:
 private:
     ServerOptions server_options;
     ServerGameState server_game_state;
+
+public:
+    void start();
 };
 
 #endif //ROBOTS_SERVER_MANAGER_HPP
