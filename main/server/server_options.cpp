@@ -77,7 +77,7 @@ void ServerOptions::parse_options(int argc, char **argv) {
     if (vm.count("seed") && vm.size() == NUMBER_OF_REQUIRED_OPTIONS) throw ServerOptionsException("Not enough arguments");
 
     if (vm.count("seed")) {
-        seed = vm["seed"].as<std::uint32_t>();
+        seed = parse_numeric_value<std::uint32_t, std::int64_t>(vm, "seed");
     }
     else {
         seed = static_cast<std::uint32_t>(std::chrono::system_clock::now().time_since_epoch().count());

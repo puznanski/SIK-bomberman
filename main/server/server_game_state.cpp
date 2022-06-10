@@ -25,8 +25,8 @@ Turn ServerGameState::initialize_game(const std::vector<PlayerId>& players) {
 
     for (std::uint16_t i = 0; i < server_options.get_initial_blocks(); i++) {
         Position position = get_random_position();
-        blocks.insert(position);
-        events.push_back(std::make_shared<EventBlockPlaced>(position));
+        auto x = blocks.insert(position);
+        if (x.second) events.push_back(std::make_shared<EventBlockPlaced>(position));
     }
 
     current_turn = Turn(0, events);
