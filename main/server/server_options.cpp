@@ -142,22 +142,3 @@ std::uint16_t ServerOptions::get_size_x() const {
 std::uint16_t ServerOptions::get_size_y() const {
     return size_y;
 }
-
-std::string ServerOptions::to_string() const {
-    std::stringstream ss;
-
-    ss << "Server options:\n";
-    ss << "--bomb-timer: " << bomb_timer << "\n";
-    ss << "--players-count: " << players_count + 0 << "\n";
-    ss << "--turn-duration: " << turn_duration << "\n";
-    ss << "--explosion-radius: " << explosion_radius << "\n";
-    ss << "--initial-blocks: " << initial_blocks << "\n";
-    ss << "--game-length: " << game_length << "\n";
-    ss << "--server-name: " << server_name << "\n";
-    ss << "--port: " << port << "\n";
-    ss << "--seed: " << seed << "\n";
-    ss << "--size-x: " << size_x << "\n";
-    ss << "--size-y: " << size_y << "\n";
-
-    return ss.str();
-}

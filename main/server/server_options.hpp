@@ -55,8 +55,6 @@ public:
     [[nodiscard]] std::uint32_t get_seed() const;
     [[nodiscard]] std::uint16_t get_size_x() const;
     [[nodiscard]] std::uint16_t get_size_y() const;
-
-    std::string to_string() const;
 };
 
 #endif //ROBOTS_SERVER_OPTIONS_HPP

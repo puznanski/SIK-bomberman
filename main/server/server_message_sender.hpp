@@ -12,7 +12,7 @@
 
 class ServerMessageSender {
 public:
-    explicit ServerMessageSender(std::shared_ptr<boost::asio::ip::tcp::socket> socket) : socket(std::move(socket)) {};
+    explicit ServerMessageSender(std::shared_ptr<boost::asio::ip::tcp::socket> socket) : socket(socket) {};
 
 private:
     std::queue<std::shared_ptr<ServerMessage>> queue;
@@ -20,11 +20,17 @@ private:
     std::condition_variable condition_variable;
     std::shared_ptr<boost::asio::ip::tcp::socket> socket;
 
+    bool error = false;
+    mutable std::mutex error_mutex;
+
     std::shared_ptr<ServerMessage> dequeue();
 
 public:
     void enqueue(const std::shared_ptr<ServerMessage>& message);
     [[noreturn]] void send_messages();
+
+    void set_error();
+    bool get_error() const;
 };
 
 #endif //ROBOTS_SERVER_MESSAGE_SENDER_HPP

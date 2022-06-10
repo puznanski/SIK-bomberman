@@ -18,18 +18,16 @@ public:
 
 private:
     std::uint8_t players_count;
+    PlayerId next_id{};
     std::queue<std::pair<PlayerId, Player>> queue;
     mutable std::mutex mutex;
     std::condition_variable condition_variable;
-    PlayerId next_id{};
-    std::map<PlayerId, Player> players;
 
     void enqueue(const std::pair<PlayerId, Player>& new_element);
 
 public:
     std::pair<PlayerId, Player> dequeue();
     std::optional<PlayerId> add_player(const Player& player);
-    std::map<PlayerId, Player> get_players();
     void clear();
 };
 

@@ -9,8 +9,14 @@
 GameClient::GameClient(std::shared_ptr<boost::asio::ip::tcp::socket> socket,
                        boost::asio::ip::tcp::endpoint endpoint, ServerOptions &server_options,
                        std::mutex &manager_mutex, ServerLobby &server_lobby) :
-        socket(std::move(socket)), endpoint(std::move(endpoint)), server_options(server_options),
+        socket(socket), endpoint(std::move(endpoint)), server_options(server_options),
         manager_mutex(manager_mutex), server_lobby(server_lobby), sender(socket) {}
+
+GameClient::~GameClient() {
+    if (client_thread) {
+        client_thread->join();
+    }
+}
 
 void GameClient::send_hello_message() {
     ServerMessageHello hello_message(server_options.get_server_name(), server_options.get_players_count(),
@@ -30,31 +36,62 @@ void GameClient::listen_client() {
 
             switch (type) {
                 case Join: {
+                    if (player_id) break;
+
                     ClientMessageJoin message(tcp_bytestream);
-                    Player player(message.name, endpoint.address().to_string());
+                    std::ostringstream address;
+                    address << endpoint;
+                    Player player(message.name, address.str());
                     player_id = server_lobby.add_player(player);
                     break;
                 }
                 case PlaceBomb:
                 case PlaceBlock: {
-                    last_movement = PlayerMovement(type);
+                    if (!player_id) break;
+                    set_player_movement(PlayerMovement(type));
                     break;
                 }
                 case Move: {
+                    if (!player_id) break;
                     ClientMessageMove message(tcp_bytestream);
-                    last_movement = PlayerMovement(type, message.direction);
+                    set_player_movement({type, message.direction});
                     break;
                 }
             }
         }
         catch (const std::exception& e) {
-            std::cerr << e.what() << "\n";
-            exit(1);
+            set_error();
         }
     }
 }
 
+void GameClient::set_player_movement(PlayerMovement movement) {
+    std::lock_guard<std::mutex> lock(manager_mutex);
+    last_movement = movement;
+}
+
+void GameClient::set_error() {
+    std::lock_guard<std::mutex> lock(error_mutex);
+    error = true;
+}
+
 void GameClient::start_communication() {
-    send_hello_message();
-    listen_client();
-};
+    std::thread sender_thread(&ServerMessageSender::send_messages, &sender);
+    try {
+        listen_client();
+    }
+    catch (const std::exception& e) {
+        sender.set_error();
+        sender_thread.join();
+        boost::system::error_code ec;
+        socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        set_error();
+    }
+}
+
+bool GameClient::get_error() const {
+    std::lock_guard<std::mutex> lock(error_mutex);
+    return error;
+}
+
+

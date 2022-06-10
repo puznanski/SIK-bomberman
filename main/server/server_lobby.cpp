@@ -23,16 +23,11 @@ std::optional<PlayerId> ServerLobby::add_player(const Player& player) {
     if (next_id < players_count) {
         std::pair<PlayerId, Player> new_player(next_id, player);
         enqueue(new_player);
-        players.insert(new_player);
 
         return next_id++;
     }
 
     return std::nullopt;
-}
-
-std::map<PlayerId, Player> ServerLobby::get_players() {
-    return players;
 }
 
 void ServerLobby::clear() {

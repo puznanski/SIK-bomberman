@@ -39,8 +39,10 @@ private:
 
 public:
     Turn initialize_game(const std::vector<PlayerId>& players);
-    Turn handle_turn(std::map<PlayerId, PlayerMovement> player_movements);
-    std::vector<Turn> get_turns();
+    Turn handle_turn(std::map<PlayerId, std::optional<PlayerMovement>> player_movements);
+    [[nodiscard]] std::vector<Turn> get_turns() const;
+    [[nodiscard]] std::map<PlayerId, Score> get_scores() const;
+    [[nodiscard]] bool is_game_finished() const;
 };
 
 #endif //ROBOTS_SERVER_GAME_STATE_HPP

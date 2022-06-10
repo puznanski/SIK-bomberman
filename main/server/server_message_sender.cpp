@@ -27,3 +27,13 @@ void ServerMessageSender::enqueue(const std::shared_ptr<ServerMessage>& message)
         boost::asio::write(*socket, boost::asio::buffer(serialized_message));
     }
 }
+
+void ServerMessageSender::set_error() {
+    std::lock_guard<std::mutex> lock(error_mutex);
+    error = true;
+}
+
+bool ServerMessageSender::get_error() const {
+    std::lock_guard<std::mutex> lock(error_mutex);
+    return error;
+}

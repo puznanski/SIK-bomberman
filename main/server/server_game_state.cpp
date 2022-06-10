@@ -34,7 +34,7 @@ Turn ServerGameState::initialize_game(const std::vector<PlayerId>& players) {
     return current_turn;
 }
 
-Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_movements) {
+Turn ServerGameState::handle_turn(std::map<PlayerId, std::optional<PlayerMovement>> player_movements) {
     robots_destroyed.clear();
     blocks_destroyed.clear();
     std::vector<std::shared_ptr<Event>> events;
@@ -44,12 +44,16 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
     auto bomb_it = bombs.begin();
 
     while (bomb_it != bombs.end()) {
-        std::uint16_t timer = --bomb_it->second.timer;
+        bomb_it->second.timer -= 1;
+
+        std::uint16_t timer = bomb_it->second.timer;
         if (timer == 0) {
             if (blocks.contains(bomb_it->second.position)) {
                 handle_explosion(bomb_it->second.position);
             }
             else {
+                handle_explosion(bomb_it->second.position);
+
                 auto range = static_cast<std::int32_t>(std::max(0, bomb_it->second.position.x - explosion_radius));
 
                 for (std::int32_t x = bomb_it->second.position.x - 1; x >= range; x--) {
@@ -89,7 +93,7 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
             blocks_destroyed.clear();
         }
         else {
-            bomb_it = bomb_it++;
+            bomb_it++;
         }
     }
 
@@ -97,7 +101,7 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
         blocks.erase(block);
     }
 
-    for (auto player : player_positions) {
+    for (auto& player : player_positions) {
         if (all_destroyed_robots.contains(player.first)) {
             Position new_position = get_random_position();
             player.second = new_position;
@@ -105,25 +109,24 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
             events.push_back(std::make_shared<EventPlayerMoved>(player.first, new_position));
         }
         else {
-            try {
-                auto movement = player_movements.at(player.first);
-
-                if (movement.movement_type == ClientMessageType::PlaceBomb) {
+            auto movement = player_movements.at(player.first);
+            if (movement) {
+                if (movement.value().movement_type == ClientMessageType::PlaceBomb) {
                     Bomb new_bomb(player.second, server_options.get_bomb_timer());
                     bombs.insert({next_bomb_id, new_bomb});
                     events.push_back(std::make_shared<EventBombPlaced>(next_bomb_id++, player.second));
                 }
-                else if (movement.movement_type == ClientMessageType::PlaceBlock) {
+                else if (movement.value().movement_type == ClientMessageType::PlaceBlock) {
                     if (blocks.insert(player.second).second) {
                         events.push_back(std::make_shared<EventBlockPlaced>(player.second));
                     }
                 }
-                else if (movement.movement_type == ClientMessageType::Move) {
-                    auto move = handle_move(player.second, movement.direction.value());
+                else if (movement.value().movement_type == ClientMessageType::Move) {
+                    auto move = handle_move(player.second, movement.value().direction.value());
+                    player_positions.at(player.first) = move.second;
                     if (move.first) events.push_back(std::make_shared<EventPlayerMoved>(player.first, move.second));
                 }
             }
-            catch (const std::out_of_range &e) {}
         }
     }
 
@@ -133,13 +136,17 @@ Turn ServerGameState::handle_turn(std::map<PlayerId, PlayerMovement> player_move
 }
 
 Position ServerGameState::get_random_position() {
-    return {static_cast<std::uint16_t>(random_generator() % server_options.get_size_x()),
-            static_cast<std::uint16_t>(random_generator() % server_options.get_size_y())};
+    auto x = static_cast<std::uint16_t>(random_generator() % server_options.get_size_x());
+    auto y = static_cast<std::uint16_t>(random_generator() % server_options.get_size_y());
+
+    return {x, y};
 }
 
 bool ServerGameState::handle_explosion(Position position) {
-    for (auto player : player_positions) {
-        if (player.second == position) robots_destroyed.push_back(player.first);
+    for (auto& player : player_positions) {
+        if (player.second == position) {
+            robots_destroyed.push_back(player.first);
+        }
     }
 
     if (blocks.contains(position)) {
@@ -152,18 +159,25 @@ bool ServerGameState::handle_explosion(Position position) {
 
 std::pair<bool, Position> ServerGameState::handle_move(const Position &old_position, Direction direction) {
     bool has_moved = false;
-    Position position;
+    bool out_of_range = false;
+    Position position = old_position;
 
     switch (direction) {
         case Up: {
-            if (old_position.y != server_options.get_size_y()) {
+            if (old_position.y != server_options.get_size_y() - 1) {
                 position = Position(old_position.x, old_position.y + 1);
+            }
+            else {
+                out_of_range = true;
             }
             break;
         }
         case Right: {
-            if (old_position.x != server_options.get_size_x()) {
+            if (old_position.x != server_options.get_size_x() - 1) {
                 position = Position(old_position.x + 1, old_position.y);
+            }
+            else {
+                out_of_range = true;
             }
             break;
         }
@@ -171,22 +185,40 @@ std::pair<bool, Position> ServerGameState::handle_move(const Position &old_posit
             if (old_position.y != 0) {
                 position = Position(old_position.x, old_position.y - 1);
             }
+            else {
+                out_of_range = true;
+            }
             break;
         }
         case Left: {
             if (old_position.x != 0) {
                 position = Position(old_position.x - 1, old_position.y);
             }
+            else {
+                out_of_range = true;
+            }
             break;
         }
     }
 
-    if (blocks.contains(position)) position = old_position;
-    else has_moved = true;
+    if (blocks.contains(position)) {
+        position = old_position;
+    }
+    else if (!out_of_range) {
+        has_moved = true;
+    }
 
     return {has_moved, position};
 }
 
-std::vector<Turn> ServerGameState::get_turns() {
+std::vector<Turn> ServerGameState::get_turns() const {
     return turns;
+}
+
+std::map<PlayerId, Score> ServerGameState::get_scores() const {
+    return scores;
+}
+
+bool ServerGameState::is_game_finished() const {
+    return current_turn.turn_number >= server_options.get_game_length();
 }
